@@ -10,7 +10,7 @@
     <artifactId>ewm-service</artifactId>
     <packaging>jar</packaging>
 
-    <name>main</name>
+    <name>ewm-service</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
