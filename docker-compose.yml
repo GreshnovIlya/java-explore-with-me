@@ -9,11 +9,6 @@ services:
     depends_on:
       stats-db:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9090/actuator/health || exit 1" ]
-      timeout: 10s
-      interval: 30s
-      retries: 3
 
   stats-db:
     image: postgres:16.1
@@ -24,6 +19,34 @@ services:
       - ./volumes/postgres/stats-db:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=stats-db
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  ewm-service:
+    build:
+      context: ./ewm-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: ewm-service
+    depends_on:
+      ewm-db:
+        condition: service_healthy
+
+  ewm-db:
+    image: postgres:16.1
+    container_name: main-db
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./volumes/postgres/main-db:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=main-db
       - POSTGRES_USER=sa
       - POSTGRES_PASSWORD=password
     healthcheck:
