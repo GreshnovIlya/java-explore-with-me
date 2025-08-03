@@ -1,11 +1,11 @@
 services:
-  stats-service:
+  stats-server:
     build:
-      context: ./stats/stats-service
+      context: ./stats/stats-server
       dockerfile: Dockerfile
     ports:
       - "9090:9090"
-    container_name: stats-service
+    container_name: stats-server
     depends_on:
       stats-db:
         condition: service_healthy
@@ -35,7 +35,7 @@ services:
       - "8080:8080"
     container_name: main
     depends_on:
-      stats-service:
+      stats-server:
         condition: service_healthy
       ewm-db:
         condition: service_healthy
