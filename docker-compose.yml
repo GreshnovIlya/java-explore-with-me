@@ -6,6 +6,9 @@ services:
     ports:
       - "9090:9090"
     container_name: stats-server
+    depends_on:
+      stats-db:
+        condition: service_healthy
 
   stats-db:
     image: postgres:16.1
@@ -31,6 +34,9 @@ services:
     ports:
       - "8080:8080"
     container_name: ewm-service
+    depends_on:
+      ewm-db:
+        condition: service_healthy
 
   ewm-db:
     image: postgres:16.1
