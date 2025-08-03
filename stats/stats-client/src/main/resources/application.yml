@@ -1,5 +1,5 @@
 server:
-  port: 9091
+  port: 9090
 
 stats-server:
-  url: http://localhost:9090
+  url: http://localhost:9091

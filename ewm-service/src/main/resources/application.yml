@@ -7,7 +7,7 @@ spring:
       mode: always
 
   datasource:
-    url: jdbc:postgresql://localhost:5555/shareitdb
+    url: jdbc:postgresql://localhost:5555/ewm-db
     username: sa
     password: password
     driver-class-name: org.postgresql.Driver
