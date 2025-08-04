@@ -3,9 +3,10 @@ services:
     build:
       context: ./stats/stats-server
       dockerfile: Dockerfile
+    container_name: stats-server
     ports:
       - "9090:9090"
-    container_name: stats-server
+    restart: always
 
   stats-db:
     image: postgres:16.1
@@ -28,9 +29,9 @@ services:
     build:
       context: ./ewm-service
       dockerfile: Dockerfile
+    container_name: ewm-service
     ports:
       - "8080:8080"
-    container_name: ewm-service
 
   ewm-db:
     image: postgres:16.1
