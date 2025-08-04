@@ -24,8 +24,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<StatsDto> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (start.isAfter(end)) {
+            throw new RuntimeException("Начало времени не может быть позже конца");
+        }
         List<StatsDto> viewStatsDto;
-        System.out.print(start.toString());
         if (unique) {
             viewStatsDto = statsRepository.findByBetweenStartAndEndInUrisUnique(start, end, uris);
         } else {

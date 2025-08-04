@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,14 +23,14 @@ public class StatsController {
     private final StatsClient statsClient;
 
     @PostMapping("/hit")
-    public ResponseEntity<HitDto> create(@RequestBody @Valid HitDto hitDto) {
+    public ResponseEntity<Object> create(@RequestBody @Valid HitDto hitDto) {
         log.info("Запрос на сохранение информации о том, что на сервиса был отправлен запрос пользователем: {}",
                 hitDto);
         return statsClient.post(hitDto);
     }
 
     @GetExchange("/stats")
-    public ResponseEntity<Object[]> get(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public ResponseEntity<Object> get(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                             LocalDateTime start,
                                       @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                             LocalDateTime end,
@@ -39,12 +38,6 @@ public class StatsController {
                                       @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Запрос на получение статистики по посещениям от {} до {} по uri в {} с уникальными {}",
                 start, end, uris, unique);
-        if (uris == null) {
-            uris = new ArrayList<>();
-        }
-        if (start.isAfter(end)) {
-            throw new RuntimeException("Начало времени не может быть позже конца");
-        }
         return statsClient.get(start, end, uris, unique);
     }
 }
