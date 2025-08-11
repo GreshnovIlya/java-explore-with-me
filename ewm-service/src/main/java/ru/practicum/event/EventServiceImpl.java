@@ -457,8 +457,9 @@ public class EventServiceImpl implements EventService {
         }
         statsController.create(new HitDto(null, "ewm-service", "/event/" + id, "127.0.0.1",
                 LocalDateTime.now())).getBody();
-        String s = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        event.setViews(statsController.get(LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), s,
+        event.setViews(statsController.get(
+                LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 new ArrayList<>(List.of("/event/" + id)), true).getBody().stream().count());
         return EventMapper.toEventFullDto(event);
     }
