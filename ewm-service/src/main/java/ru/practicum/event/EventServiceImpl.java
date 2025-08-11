@@ -429,7 +429,7 @@ public class EventServiceImpl implements EventService {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
                         "rangeEnd. Value: %s", start));
             }
-            statsController.create(new HitDto(null, "ewm-service", "/event", "127.0.0.1", LocalDateTime.now()));
+            //statsController.create(new HitDto(null, "ewm-service", "/event", "127.0.0.1", LocalDateTime.now()));
             List<Event> events;
             if (onlyAvailable && categories == null) {
                 events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
@@ -455,12 +455,13 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != StateEvent.PUBLISHED) {
             throw new NotFoundException("Event must be published");
         }
-        statsController.create(new HitDto(null, "ewm-service", "/event/" + id, "127.0.0.1",
-                LocalDateTime.now())).getBody();
-        event.setViews(statsController.get(
-                LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                new ArrayList<>(List.of("/event/" + id)), true).getBody().stream().count());
+        //statsController.create(new HitDto(null, "ewm-service", "/event/" + id, "127.0.0.1",
+        //        LocalDateTime.now())).getBody();
+        //statsController.get(
+        //                LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+        //                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+        //                new ArrayList<>(List.of("/event/" + id)), true).getBody().stream().count()
+        event.setViews(1L);
         return EventMapper.toEventFullDto(event);
     }
 
