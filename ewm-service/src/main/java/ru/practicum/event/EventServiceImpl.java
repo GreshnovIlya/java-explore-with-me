@@ -1,13 +1,10 @@
 package ru.practicum.event;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
 import ru.practicum.StatsController;
-import ru.practicum.StatsDto;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.*;
@@ -240,7 +237,7 @@ public class EventServiceImpl implements EventService {
         List<ParticipationRequestDto> confirmedRequest = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequest = new ArrayList<>();
         if (requests.getStatus().equals("CONFIRMED") || requests.getStatus().equals("REJECTED")) {
-            for(Long requestId : requests.getRequestIds()) {
+            for (Long requestId : requests.getRequestIds()) {
                 ParticipationRequest request = requestRepository.findById(requestId).orElseThrow(
                         () -> new NewBadRequestException(String.format("Request with id=%s was not found", requestId)));
                 if (!request.getStatus().equals("PENDING")) {

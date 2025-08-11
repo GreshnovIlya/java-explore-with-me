@@ -95,7 +95,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
-        PageRequest pageRequest = PageRequest.of(from/size, size);
+        PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Compilation> compilations;
         if (pinned != null) {
             compilations = compilationRepository.findAllByPinned(pinned, pageRequest).stream().toList();
