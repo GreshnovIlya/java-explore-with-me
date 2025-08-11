@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -23,17 +22,17 @@ public class StatsController {
     private final StatsClient statsClient;
 
     @PostMapping("/hit")
-    public ResponseEntity<Object> create(@RequestBody @Valid HitDto hitDto) {
+    public ResponseEntity<HitDto> create(@RequestBody @Valid HitDto hitDto) {
         log.info("Запрос на сохранение информации о том, что на сервиса был отправлен запрос пользователем: {}",
                 hitDto);
         return statsClient.post(hitDto);
     }
 
     @GetExchange("/stats")
-    public ResponseEntity<Object> get(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                            LocalDateTime start,
+    public ResponseEntity<List<StatsDto>> get(@RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                            String start,
                                       @RequestParam @NotNull @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                            LocalDateTime end,
+                                            String end,
                                       @RequestParam @Nullable List<String> uris,
                                       @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Запрос на получение статистики по посещениям от {} до {} по uri в {} с уникальными {}",
