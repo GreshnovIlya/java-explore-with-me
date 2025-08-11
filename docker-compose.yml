@@ -18,7 +18,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats-db
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: password
-    restart: on-failure:5
 
   stats-db:
     image: postgres:16.1
@@ -63,7 +62,7 @@ services:
     image: postgres:16.1
     container_name: ewm-db
     ports:
-      - "5555:5432"
+      - "5555:5555"
     volumes:
       - ./volumes/postgres/ewm-db:/var/lib/postgresql/data/
     environment:
