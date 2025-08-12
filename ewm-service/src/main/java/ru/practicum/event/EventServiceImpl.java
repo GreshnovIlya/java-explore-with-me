@@ -466,7 +466,7 @@ public class EventServiceImpl implements EventService {
                     LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                     new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
         } catch (Exception e) {
-            event.setViews(0L);
+            event.setViews(1L);
         }
         event = eventRepository.save(event);
         return EventMapper.toEventFullDto(event);
