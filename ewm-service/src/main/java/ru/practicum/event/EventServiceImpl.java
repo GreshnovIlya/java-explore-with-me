@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.HitDto;
-import ru.practicum.StatsController;
+import ru.practicum.StatsClient;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.*;
@@ -35,7 +35,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final RequestRepository requestRepository;
     private final LocationRepository locationRepository;
-    private final StatsController statsController;
+    private final StatsClient statsClient;
 
 
     @Override
@@ -415,26 +415,15 @@ public class EventServiceImpl implements EventService {
         if (sort.equals("EVENT_DATE") || sort.equals("VIEWS")) {
             LocalDateTime start;
             LocalDateTime end;
-            if (rangeStart == null) {
-                start = toLocalDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            } else {
-                start = toLocalDateTime(rangeStart);
-            }
-            if (rangeEnd == null) {
-                end = toLocalDateTime(LocalDateTime.now().plusYears(1000)
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            } else {
-                end = toLocalDateTime(rangeEnd);
-            }
+            start = toLocalDateTime(Objects.requireNonNullElseGet(rangeStart, () -> LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            end = toLocalDateTime(Objects.requireNonNullElseGet(rangeEnd, () -> LocalDateTime.now().plusYears(1000)
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
             if (start.isAfter(end)) {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
                         "rangeEnd. Value: %s", start));
             }
+            statsClient.post(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
             List<Event> events;
-            try {
-                statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
-            } catch (Exception ignored) {
-            }
             if (onlyAvailable && categories == null) {
                 events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
             } else if (onlyAvailable) {
@@ -459,15 +448,12 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != StateEvent.PUBLISHED) {
             throw new NotFoundException("Event must be published");
         }
-        try {
-            statsController.create(new HitDto(null, "ewm-service", "/events/" + id, "127.0.0.1", LocalDateTime.now()));
-            event.setViews(statsController.get(
-                    LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                    LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                    new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
-        } catch (Exception e) {
-            event.setViews(1L);
-        }
+        statsClient.post(new HitDto(null, "ewm-service", "/events/" + id, "127.0.0.1",
+                LocalDateTime.now())).getBody();
+        event.setViews(statsClient.get(
+                        LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
         event = eventRepository.save(event);
         return EventMapper.toEventFullDto(event);
     }
