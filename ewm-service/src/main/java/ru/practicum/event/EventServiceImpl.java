@@ -430,7 +430,10 @@ public class EventServiceImpl implements EventService {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
                         "rangeEnd. Value: %s", start));
             }
-            statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
+            try {
+                statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
+            } finally {
+            }
             List<Event> events;
             if (onlyAvailable && categories == null) {
                 events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
@@ -456,12 +459,15 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != StateEvent.PUBLISHED) {
             throw new NotFoundException("Event must be published");
         }
-        statsController.create(new HitDto(null, "ewm-service", "/events/" + id, "127.0.0.1",
-                LocalDateTime.now())).getBody();
-        event.setViews(statsController.get(
-                        LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                        LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-                        new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
+        try {
+            statsController.create(new HitDto(null, "ewm-service", "/events/" + id, "127.0.0.1", LocalDateTime.now()));
+            event.setViews(statsController.get(
+                    LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
+        } catch (Exception e){
+            event.setViews(0L);
+        }
         event = eventRepository.save(event);
         return EventMapper.toEventFullDto(event);
     }
