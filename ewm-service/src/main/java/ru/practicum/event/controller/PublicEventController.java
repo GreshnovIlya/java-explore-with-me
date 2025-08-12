@@ -1,6 +1,7 @@
 package ru.practicum.event.controller;
 
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -30,12 +31,14 @@ public class PublicEventController {
                                                  @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                                  @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                                  @RequestParam(defaultValue = "0") Integer from,
-                                                 @RequestParam(defaultValue = "10") Integer size) {
-        return service.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+                                                 @RequestParam(defaultValue = "10") Integer size,
+                                                 HttpServletRequest httpServletRequest) {
+        return service.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size,
+                httpServletRequest);
     }
 
     @GetMapping("/{id}")
-    private EventFullDto getEventByIdByAdmin(@PathVariable Long id) {
-        return service.getEventById(id);
+    private EventFullDto getEventByIdByAdmin(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        return service.getEventById(id, httpServletRequest);
     }
 }
