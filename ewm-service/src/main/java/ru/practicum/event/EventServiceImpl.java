@@ -3,7 +3,7 @@ package ru.practicum.event;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-//import ru.practicum.HitDto;
+import ru.practicum.HitDto;
 import ru.practicum.StatsController;
 import ru.practicum.category.CategoryRepository;
 import ru.practicum.category.model.Category;
@@ -416,12 +416,13 @@ public class EventServiceImpl implements EventService {
             LocalDateTime start;
             LocalDateTime end;
             if (rangeStart == null) {
-                start = LocalDateTime.now();
+                start = toLocalDateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             } else {
                 start = toLocalDateTime(rangeStart);
             }
             if (rangeEnd == null) {
-                end = LocalDateTime.now().plusYears(1000);
+                end = toLocalDateTime(LocalDateTime.now().plusYears(1000)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             } else {
                 end = toLocalDateTime(rangeEnd);
             }
@@ -429,7 +430,7 @@ public class EventServiceImpl implements EventService {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
                         "rangeEnd. Value: %s", start));
             }
-            //statsController.create(new HitDto(null, "ewm-service", "/event", "127.0.0.1", LocalDateTime.now()));
+            statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
             List<Event> events;
             if (onlyAvailable && categories == null) {
                 events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
@@ -455,13 +456,13 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != StateEvent.PUBLISHED) {
             throw new NotFoundException("Event must be published");
         }
-        //statsController.create(new HitDto(null, "ewm-service", "/event/" + id, "127.0.0.1",
-        //        LocalDateTime.now())).getBody();
-        //statsController.get(
-        //                LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-        //                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-        //                new ArrayList<>(List.of("/event/" + id)), true).getBody().stream().count()
-        event.setViews(1L);
+        statsController.create(new HitDto(null, "ewm-service", "/events/" + id, "127.0.0.1",
+                LocalDateTime.now())).getBody();
+        event.setViews(statsController.get(
+                        LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                        new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
+        event = eventRepository.save(event);
         return EventMapper.toEventFullDto(event);
     }
 
