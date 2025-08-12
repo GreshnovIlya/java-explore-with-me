@@ -2,7 +2,6 @@ package ru.practicum;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.NewBadRequestException;
 import ru.practicum.model.Hit;
