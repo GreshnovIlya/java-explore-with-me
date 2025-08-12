@@ -433,17 +433,17 @@ public class EventServiceImpl implements EventService {
             List<Event> events;
             try {
                 statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
-            } finally {
-                if (onlyAvailable && categories == null) {
-                    events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
-                } else if (onlyAvailable) {
-                    events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid, start, end, sort, from, size);
-                } else if (categories == null) {
-                    events = eventRepository.findEventByPaid(text, paid, start, end, sort, from, size);
-                } else {
-                    events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, start, end,
-                            sort, from, size);
-                }
+            } catch (Exception ignored) {
+            }
+            if (onlyAvailable && categories == null) {
+                events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
+            } else if (onlyAvailable) {
+                events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid, start, end, sort, from, size);
+            } else if (categories == null) {
+                events = eventRepository.findEventByPaid(text, paid, start, end, sort, from, size);
+            } else {
+                events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, start, end,
+                        sort, from, size);
             }
             return events.stream().map(EventMapper::toEventShortDto).toList();
         } else {
