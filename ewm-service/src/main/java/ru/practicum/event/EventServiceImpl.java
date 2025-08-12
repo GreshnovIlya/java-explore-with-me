@@ -430,20 +430,20 @@ public class EventServiceImpl implements EventService {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
                         "rangeEnd. Value: %s", start));
             }
+            List<Event> events;
             try {
                 statsController.create(new HitDto(null, "ewm-service", "/events", "127.0.0.1", LocalDateTime.now()));
             } finally {
-            }
-            List<Event> events;
-            if (onlyAvailable && categories == null) {
-                events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
-            } else if (onlyAvailable) {
-                events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid, start, end, sort, from, size);
-            } else if (categories == null) {
-                events = eventRepository.findEventByPaid(text, paid, start, end, sort, from, size);
-            } else {
-                events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, start, end,
-                        sort, from, size);
+                if (onlyAvailable && categories == null) {
+                    events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
+                } else if (onlyAvailable) {
+                    events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid, start, end, sort, from, size);
+                } else if (categories == null) {
+                    events = eventRepository.findEventByPaid(text, paid, start, end, sort, from, size);
+                } else {
+                    events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, start, end,
+                            sort, from, size);
+                }
             }
             return events.stream().map(EventMapper::toEventShortDto).toList();
         } else {
@@ -465,7 +465,7 @@ public class EventServiceImpl implements EventService {
                     LocalDateTime.now().minusYears(100).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                     LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                     new ArrayList<>(List.of("/events/" + id)), true).getBody().stream().count());
-        } catch (Exception e){
+        } catch (Exception e) {
             event.setViews(0L);
         }
         event = eventRepository.save(event);
