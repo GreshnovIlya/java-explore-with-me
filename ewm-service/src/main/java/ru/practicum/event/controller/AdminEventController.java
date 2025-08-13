@@ -14,6 +14,7 @@ import ru.practicum.event.EventService;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.UpdateEventAdminRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,8 +27,8 @@ public class AdminEventController {
     private List<EventFullDto> getEventsByAdmin(@RequestParam @Nullable List<Long> users,
                                                 @RequestParam @Nullable List<String> states,
                                                 @RequestParam @Nullable List<Long> categories,
-                                                @RequestParam @Nullable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeStart,
-                                                @RequestParam @Nullable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String rangeEnd,
+                                                @RequestParam @Nullable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                @RequestParam @Nullable @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                 @RequestParam(defaultValue = "0") Integer from,
                                                 @RequestParam(defaultValue = "10") Integer size) {
         return service.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);

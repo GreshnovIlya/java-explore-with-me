@@ -53,10 +53,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto updateCategory(Long catId, NewCategoryDto categoryDto) {
+    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId).orElseThrow(
                 () -> new NotFoundException(String.format("Category with id=%s was not found", catId)));
-        if (category.getName() != null) {
+        if (categoryDto.getName() != null) {
             if (categoryDto.getName().length() > 50 || categoryDto.getName().isBlank()) {
                 throw new NewBadRequestException(String.format("Field: name. Error: it must be between 1 and 50 " +
                         "characters long. Long: %s", categoryDto.getName().length()));

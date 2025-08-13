@@ -281,44 +281,39 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> getEventsByAdmin(List<Long> users, List<String> states, List<Long> categories,
-                                        String rangeStart, String rangeEnd, Integer from, Integer size) {
-        LocalDateTime start;
-        LocalDateTime end;
+                                               LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from,
+                                               Integer size) {
         if (rangeStart == null) {
-            start = LocalDateTime.now();
-        } else {
-            start = toLocalDateTime(rangeStart);
+            rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
-            end = LocalDateTime.now().plusYears(1000);
-        } else {
-            end = toLocalDateTime(rangeEnd);
+            rangeEnd = LocalDateTime.now().plusYears(1000);
         }
-        if (start.isAfter(end)) {
+        if (rangeStart.isAfter(rangeEnd)) {
             throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
-                    "rangeEnd. Value: %s", start));
+                    "rangeEnd. Value: %s", rangeStart));
         }
         List<Event> events;
         if (users == null && states == null && categories == null) {
-            events = eventRepository.findByAdmin(start, end, Long.valueOf(from), Long.valueOf(size));
+            events = eventRepository.findByAdmin(rangeStart, rangeEnd, Long.valueOf(from), Long.valueOf(size));
         } else if (users != null && states == null && categories == null) {
-            events = eventRepository.findByAdminUsers(users, start, end, Long.valueOf(from), Long.valueOf(size));
+            events = eventRepository.findByAdminUsers(users, rangeStart, rangeEnd, Long.valueOf(from), Long.valueOf(size));
         } else if (users == null && states != null && categories == null) {
-            events = eventRepository.findByAdminStates(states, start, end, Long.valueOf(from), Long.valueOf(size));
+            events = eventRepository.findByAdminStates(states, rangeStart, rangeEnd, Long.valueOf(from), Long.valueOf(size));
         } else if (users == null && states == null) {
-            events = eventRepository.findByAdminCategories(categories, start, end, Long.valueOf(from),
+            events = eventRepository.findByAdminCategories(categories, rangeStart, rangeEnd, Long.valueOf(from),
                     Long.valueOf(size));
         } else if (users != null && states != null && categories == null) {
-            events = eventRepository.findByAdminUsersAndStates(users, states, start, end, Long.valueOf(from),
+            events = eventRepository.findByAdminUsersAndStates(users, states, rangeStart, rangeEnd, Long.valueOf(from),
                     Long.valueOf(size));
         } else if (users == null) {
-            events = eventRepository.findByAdminStatesAndCategories(states, categories, start, end, Long.valueOf(from),
+            events = eventRepository.findByAdminStatesAndCategories(states, categories, rangeStart, rangeEnd, Long.valueOf(from),
                     Long.valueOf(size));
         } else if (states == null) {
-            events = eventRepository.findByAdminUsersAndCategories(users, categories, start, end, Long.valueOf(from),
+            events = eventRepository.findByAdminUsersAndCategories(users, categories, rangeStart, rangeEnd, Long.valueOf(from),
                     Long.valueOf(size));
         } else {
-            events = eventRepository.findByAdminUsersAndStatesAndCategories(users, states, categories, start, end,
+            events = eventRepository.findByAdminUsersAndStatesAndCategories(users, states, categories, rangeStart, rangeEnd,
                     Long.valueOf(from), Long.valueOf(size));
         }
         return events.stream().map(EventMapper::toEventFullDto).toList();
@@ -410,31 +405,33 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, String rangeStart,
-                                         String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+    public List<EventShortDto> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+                                         LocalDateTime rangeEnd, Boolean onlyAvailable, String sort, Integer from,
                                          Integer size, HttpServletRequest httpServletRequest) {
         if (sort.equals("EVENT_DATE") || sort.equals("VIEWS")) {
-            LocalDateTime start;
-            LocalDateTime end;
-            start = toLocalDateTime(Objects.requireNonNullElseGet(rangeStart, () -> LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            end = toLocalDateTime(Objects.requireNonNullElseGet(rangeEnd, () -> LocalDateTime.now().plusYears(1000)
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
-            if (start.isAfter(end)) {
+            if (rangeStart == null) {
+                rangeStart = LocalDateTime.now();
+            }
+            if (rangeEnd == null) {
+                rangeEnd = LocalDateTime.now().plusYears(1000);
+            }
+            if (rangeStart.isAfter(rangeEnd)) {
                 throw new NewBadRequestException(String.format("Field: start. Error: rangeStart should be before " +
-                        "rangeEnd. Value: %s", start));
+                        "rangeEnd. Value: %s", rangeStart));
             }
             statsController.create(new HitDto(null, "ewm-service", httpServletRequest.getRequestURI(),
                     httpServletRequest.getRemoteAddr(), LocalDateTime.now()));
             List<Event> events;
             if (onlyAvailable && categories == null) {
-                events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, start, end, sort, from, size);
+                events = eventRepository.findEventWhereOnlyAvailableByPaid(text, paid, rangeStart, rangeEnd, sort,
+                        from, size);
             } else if (onlyAvailable) {
-                events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid, start, end, sort, from, size);
+                events = eventRepository.findEventWhereOnlyAvailableByCategoriesAndPaid(text, categories, paid,
+                        rangeStart, rangeEnd, sort, from, size);
             } else if (categories == null) {
-                events = eventRepository.findEventByPaid(text, paid, start, end, sort, from, size);
+                events = eventRepository.findEventByPaid(text, paid, rangeStart, rangeEnd, sort, from, size);
             } else {
-                events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, start, end,
+                events = eventRepository.findEventByCategoriesAndPaid(text, categories, paid, rangeStart, rangeEnd,
                         sort, from, size);
             }
             return events.stream().map(EventMapper::toEventShortDto).toList();

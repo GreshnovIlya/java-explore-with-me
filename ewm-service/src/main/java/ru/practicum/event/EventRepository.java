@@ -75,7 +75,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = """
             SELECT *
             FROM events
-            WHERE (category IN ?2)
+            WHERE (category IN ?1)
             AND (event_date BETWEEN ?2 AND ?3)
             LIMIT ?5
             OFFSET ?4;
