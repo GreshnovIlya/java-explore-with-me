@@ -3,6 +3,7 @@ package ru.practicum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.NewBadRequestException;
 import ru.practicum.model.Hit;
 import ru.practicum.model.HitMapper;
 
@@ -25,7 +26,7 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<StatsDto> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (start.isAfter(end)) {
-            throw new RuntimeException("Начало времени не может быть позже конца");
+            throw new NewBadRequestException("Начало времени не может быть позже конца");
         }
         List<StatsDto> viewStatsDto;
         if (unique) {
