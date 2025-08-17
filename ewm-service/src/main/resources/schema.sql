@@ -1,4 +1,4 @@
---DROP TABLE IF EXISTS categories, users, events, compilations, compilations_events, requests, locations, comments;
+-- DROP TABLE IF EXISTS categories, users, events, compilations, compilations_events, requests, locations, comments;
 
 CREATE TABLE IF NOT EXISTS categories (
     id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
