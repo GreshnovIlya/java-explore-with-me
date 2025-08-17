@@ -1,4 +1,4 @@
---DROP TABLE IF EXISTS categories, users, events, compilations, compilations_events, requests, locations;
+--DROP TABLE IF EXISTS categories, users, events, compilations, compilations_events, requests, locations, comments;
 
 CREATE TABLE IF NOT EXISTS categories (
     id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
@@ -70,4 +70,16 @@ CREATE TABLE IF NOT EXISTS requests (
     status VARCHAR(10) NOT NULL,
     CONSTRAINT pk_request PRIMARY KEY (id),
     CONSTRAINT uq_requests UNIQUE (requester, event)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    text VARCHAR(7000) NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    author_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    visible BOOLEAN NOT NULL,
+    CONSTRAINT pk_comments PRIMARY KEY (id),
+    CONSTRAINT fk_comments_author FOREIGN KEY (author_id) REFERENCES users(id),
+    CONSTRAINT fk_comments_event FOREIGN KEY (event_id) REFERENCES events(id)
 );
