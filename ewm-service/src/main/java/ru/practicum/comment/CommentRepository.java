@@ -65,7 +65,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             SELECT *
             FROM comments
             WHERE (event_id IN ?1)
-                  AND (author_id IN ?1)
+                  AND (author_id IN ?2)
                   AND (created BETWEEN ?3 AND ?4)
                   AND (visible = ?5)
             LIMIT ?7
@@ -109,7 +109,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             SELECT *
             FROM comments
             WHERE (event_id IN ?1)
-                  AND (author_id IN ?1)
+                  AND (author_id IN ?2)
                   AND (created BETWEEN ?3 AND ?4)
             LIMIT ?6
             OFFSET ?5;
